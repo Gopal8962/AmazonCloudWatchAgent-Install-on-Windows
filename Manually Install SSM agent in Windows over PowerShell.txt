@@ -1,0 +1,40 @@
+Topic :- SSM AGent Install On Windows 2016 EC2 
+=======================================================================================================================================================
+
+Step 1 :- Create New Ec2 instance 
+
+Step 2:- Create one IAM role with 
+    
+    [   AmazonEc2RoleForSSM
+       AmazonSSMManagedinstancecore
+       AmazonSSMFullAccess
+       AmazonSSMMaintenaceWindowsRole
+    ]
+
+Step 3 :- After making macine open it and open powershell there put this command according to the steps.
+
+========================================================================================================================================================
+Download And Install the cloudwatch agent on Ec2 Instance
+
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-EC2-Instance.html
+
+
+1. $parameters = @{
+  Uri = 'https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/AmazonCloudWatchAgent.zip'
+  OutFile = "$env:TEMP\AmazonCloudWatchAgent.zip"
+}
+Invoke-WebRequest @parameters
+
+2.  Expand-Archive -Path "$env:TEMP\AmazonCloudWatchAgent.zip" -DestinationPath "$env:TEMP\AmazonCloudWatchAgent"
+
+3.  Set-Location -Path "$env:TEMP\AmazonCloudWatchAgent"
+.\install.ps1
+
+# Create the CloudWatch agent configuration file 
+
+4. Set-Location -Path 'C:\Program Files\Amazon\AmazonCloudWatchAgent\'
+.\amazon-cloudwatch-agent-config-wizard.exe
+
+5. Start The CloudWatch Agent
+
+  .\amazon-cloudwatch-agent-ctl.ps1 -a fetch-config -m ec2 -c file:'C:\Program Files\Amazon\AmazonCloudWatchAgent\config.json' -s
